@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movie Chart Gallery</title>
+  <style>
+    body {
+      background-color: #141414;
+      margin: 0;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    nav {
+      background-color: #1c1c1c;
+      padding: 15px 20px;
+      display: flex;
+      gap: 30px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    h1 {
+      color: #e50914;
+      padding: 20px;
+      margin: 0;
+    }
+
+   .poster-wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+
+
+    .poster-wall img {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid #e50914;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .poster-wall img:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html">🏠 Home</a>
+    <a href="chart.html">📊 Chart Viewer</a>
+    <a href="budget-analysis.html">📈 Insights</a>
+  </nav>
+
+  <h1>🎬 Browse Movie Charts</h1>
+
+  <!-- Random Poster Wall -->
+  <div class="poster-wall" id="posterWall"></div>
+
+  <script>
+  function goToChart(type) {
+    window.location.href = `chart.html?type=${type}`;
+  }
+
+  const posters = [
+    { img: "images/budgetVsBoxOffice.png", chart: "budgetVsBoxOffice", weight: 5 },
+    { img: "images/ratingVsBoxOffice.png", chart: "ratingVsBoxOffice", weight: 5 },
+    { img: "images/yearVsRating.png", chart: "yearVsRating", weight: 5 },
+    { img: "images/awardsVsBoxOffice.png", chart: "awardsVsBoxOffice", weight: 5 },
+    { img: "images/budget-analysis.png", chart: "budget-analysis.html", weight: 5 },
+    { img: "images/roi.png", chart: "roi", weight: 5 },
+    { img: "images/coming-soon.png", chart: null, weight: 1 } // low frequency
+  ];
+
+  // Build a weighted array
+  const weightedPosters = [];
+  posters.forEach(p => {
+    for (let i = 0; i < p.weight; i++) {
+      weightedPosters.push(p);
+    }
+  });
+
+  const posterWall = document.getElementById("posterWall");
+
+  const columns = Math.floor(window.innerWidth / 180); // ~160px card + gap
+  const rows = Math.ceil(60 / columns);
+  const grid = [];
+
+  for (let row = 0; row < rows; row++) {
+    grid[row] = [];
+    for (let col = 0; col < columns; col++) {
+      let selected;
+      let attempts = 0;
+
+      do {
+        selected = weightedPosters[Math.floor(Math.random() * weightedPosters.length)];
+        attempts++;
+      } while (
+        (col > 0 && grid[row][col - 1]?.img === selected.img) || // left
+        (row > 0 && grid[row - 1][col]?.img === selected.img) || // above
+        attempts < 20 // limit attempts to avoid infinite loop
+      );
+
+      grid[row][col] = selected;
+
+      // Create image
+      const img = document.createElement("img");
+      img.src = selected.img;
+      img.alt = "Chart Poster";
+
+      if (selected.chart) {
+        img.onclick = () => {
+          if (selected.chart.endsWith(".html")) {
+            window.location.href = selected.chart;
+          } else {
+            window.location.href = `chart.html?type=${selected.chart}`;
+          }
+        };
+      }
+
+      posterWall.appendChild(img);
+    }
+  }
+</script>
+
+
+</body>
+</html>
+
+
+
+
+
